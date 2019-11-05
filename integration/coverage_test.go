@@ -22,7 +22,7 @@ var _ = Describe("Coverage Specs", func() {
 			session := startGinkgo("./_fixtures/coverage_fixture", "-cover")
 			Eventually(session).Should(gexec.Exit(0))
 
-			Ω(session.Out).Should(gbytes.Say(("coverage: 80.0% of statements")))
+			Ω(session.Out).Should(gbytes.Say(("coverage: 80.0%% of statements")))
 
 			coverFile := "./_fixtures/coverage_fixture/coverage_fixture.coverprofile"
 			serialCoverProfileOutput, err := exec.Command("go", "tool", "cover", fmt.Sprintf("-func=%s", coverFile)).CombinedOutput()
@@ -41,7 +41,7 @@ var _ = Describe("Coverage Specs", func() {
 				session = startGinkgo("./_fixtures/coverage_fixture", "-coverpkg=github.com/onsi/ginkgo/integration/_fixtures/coverage_fixture,github.com/onsi/ginkgo/integration/_fixtures/coverage_fixture/external_coverage_fixture")
 				Eventually(session).Should(gexec.Exit(0))
 
-				Ω(session.Out).Should(gbytes.Say("coverage: 71.4% of statements in github.com/onsi/ginkgo/integration/_fixtures/coverage_fixture, github.com/onsi/ginkgo/integration/_fixtures/coverage_fixture/external_coverage_fixture"))
+				Ω(session.Out).Should(gbytes.Say("coverage: 71.4%% of statements in github.com/onsi/ginkgo/integration/_fixtures/coverage_fixture, github.com/onsi/ginkgo/integration/_fixtures/coverage_fixture/external_coverage_fixture"))
 
 				serialCoverProfileOutput, err = exec.Command("go", "tool", "cover", fmt.Sprintf("-func=%s", coverFile)).CombinedOutput()
 				Ω(err).ShouldNot(HaveOccurred())
