@@ -131,6 +131,40 @@ var _ = Describe("Coverage Specs", func() {
 		})
 	})
 
+	Context("when run in parallel with recursive mode specifying a coverprofile", func() {
+		AfterEach(func() {
+			removeSuccessfully("./_fixtures/combined_coverage_fixture/coverprofile-recursive.txt")
+			removeSuccessfully("./_fixtures/combined_coverage_fixture/first_package/coverprofile-recursive.txt")
+			removeSuccessfully("./_fixtures/combined_coverage_fixture/second_package/coverprofile-recursive.txt")
+		})
+
+		It("combines the coverages", func() {
+			session := startGinkgo("./_fixtures/combined_coverage_fixture", "-p", "-outputdir=./", "-r", "-cover", "-coverprofile=coverprofile-recursive.txt")
+			pathToFile := "./_fixtures/combined_coverage_fixture/coverprofile-recursive.txt"
+			Eventually(session).Should(gexec.Exit(0))
+
+			By("generating a combined coverage file", func() {
+				Ω(pathToFile).Should(BeARegularFile())
+			})
+
+			By("putting new line in between files", func() {
+				bytes, err := ioutil.ReadFile(pathToFile)
+				Ω(err).ShouldNot(HaveOccurred())
+				content := string(bytes)
+				fmt.Printf(content)
+				Ω(content).ShouldNot(ContainSubstring("1 0github.com/onsi"))
+			})
+
+			By("and strips multiple mode specifier", func() {
+				re := regexp.MustCompile(`mode: atomic`)
+				bytes, err := ioutil.ReadFile(pathToFile)
+				Ω(err).Should(BeNil())
+				matches := re.FindAllIndex(bytes, -1)
+				Ω(len(matches)).Should(Equal(1))
+			})
+		})
+	})
+
 	It("Fails with an error if output dir and coverprofile were set, but the output dir did not exist", func() {
 		session := startGinkgo("./_fixtures/combined_coverage_fixture", "-outputdir=./all/profiles/here", "-r", "-cover", "-coverprofile=coverage.txt")
 
